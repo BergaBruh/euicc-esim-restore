@@ -1,0 +1,6 @@
+id=euicc-esim-restore
+name=Euicc eSIM Restore
+version=v1.0
+versionCode=1
+author=OpenCode
+description=Restores the stock Google eSIM Manager by overriding the erroneous disable entry in /my_product/etc/config/app_v2.xml.

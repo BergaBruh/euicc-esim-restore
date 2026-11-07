@@ -1,0 +1,33 @@
+#!/sbin/sh
+
+OUTFD=$2
+ZIPFILE=$3
+MODPATH=/data/adb/modules_update/euicc-esim-restore
+
+ui_print() {
+    echo "ui_print $1" > "/proc/self/fd/$OUTFD"
+    echo "ui_print" > "/proc/self/fd/$OUTFD"
+}
+
+abort() {
+    ui_print "ERROR: $1"
+    exit 1
+}
+
+[ -f "$ZIPFILE" ] || abort "Module archive not found"
+
+ui_print "Installing Euicc eSIM Restore v1.0..."
+rm -rf "$MODPATH"
+mkdir -p "$MODPATH" || abort "Cannot create module directory"
+
+unzip -o "$ZIPFILE" -x 'META-INF/*' -d "$MODPATH" >&2 || abort "Cannot extract module"
+
+[ -f "$MODPATH/module.prop" ] || abort "module.prop is missing"
+[ -f "$MODPATH/post-fs-data.sh" ] || abort "post-fs-data.sh is missing"
+
+chmod 0644 "$MODPATH/module.prop"
+chmod 0755 "$MODPATH/post-fs-data.sh"
+chcon -R u:object_r:system_file:s0 "$MODPATH" 2>/dev/null || true
+
+ui_print "Installation complete. Reboot to apply."
+exit 0
